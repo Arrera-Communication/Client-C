@@ -21,10 +21,12 @@ public:
     ~CArreraClient();
 
     void connectToServeur(const QString &url);
+    bool sendMessage(QString message);
 
 private slots:
     void onServeurConnected();
     void onMessageResevied(const QString &message);
+
 signals:
     void messageReceived(const QString &message);
 };

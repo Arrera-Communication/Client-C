@@ -7,21 +7,17 @@ int main(int argc, char *argv[])
 
     CArreraClient client = CArreraClient(nullptr,"Socket client");
     client.connectToServeur("ws://127.0.0.1:12345");
+
     QString message;
+    string smessage;
 
-    bool connect = QObject::connect(&client, &CArreraClient::messageReceived, [](const QString &message){
-        cout << "Message :" << message.toStdString();
-        cout.flush();
-    });
+    cout << "Envoyer un message au serveur :" << endl;
+    cin >> smessage;
+    message = QString::fromStdString(smessage);
+    cout << endl;
 
-    if (!connect){
-        cout << "erreur" << endl;
-    }
-
-    //cout << "Envoyer un message au serveur :" << endl;
-    //cin >> message ;
-
-    //client.
+    if (client.sendMessage("Ma bite"))
+        cout << "Message envoyer" << endl;
 
     return a.exec();
 }
