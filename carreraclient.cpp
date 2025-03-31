@@ -20,5 +20,11 @@ void CArreraClient::onServeurConnected(){
 
 void CArreraClient::onMessageResevied(const QString &message)
 {
-    cout << "WebSocket Response:" << message.toStdString() << endl;
+    signalEmitted = true;
+    // Émettre un signal lorsqu'un message est reçu
+    emit messageReceived(message);
+
+    if (message != "Message Received"){
+        socketClient.sendTextMessage("Message Received");
+    }
 }
