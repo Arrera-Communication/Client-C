@@ -1,7 +1,7 @@
 #include "carreraclient.h"
 
-CArreraClient::CArreraClient(QObject *parent)
-    : QObject{parent}
+CArreraClient::CArreraClient(QObject *parent,QString pnameSoft)
+    : QObject{parent} , nameSoft{pnameSoft}
 {}
 
 CArreraClient::~CArreraClient(){}
@@ -15,7 +15,7 @@ void CArreraClient::connectToServeur(const QString &url)
 }
 
 void CArreraClient::onServeurConnected(){
-    socketClient.sendTextMessage("A");
+    socketClient.sendTextMessage(nameSoft);
 }
 
 void CArreraClient::onMessageResevied(const QString &message)

@@ -14,9 +14,10 @@ class CArreraClient : public QObject
     Q_OBJECT
 private :
     QWebSocket socketClient;
+    QString nameSoft;
     volatile bool signalEmitted = false;
 public:
-    explicit CArreraClient(QObject *parent = nullptr);
+    explicit CArreraClient(QObject *parent = nullptr,QString pnameSoft = "");
     ~CArreraClient();
 
     void connectToServeur(const QString &url);
