@@ -1,51 +1,73 @@
+// carreraclient.cpp
 #include "carreraclient.h"
 
-CArreraClient::CArreraClient(QObject *parent,QString pnameSoft)
-    : QObject{parent} , nameSoft{pnameSoft}
-{}
-
-CArreraClient::~CArreraClient(){}
-
-void CArreraClient::connectToServeur(const QString &url)
+CArreraClient::CArreraClient(QObject *parent, QString pnameSoft)
+    : QObject{parent}, nameSoft{pnameSoft}
 {
-    connect(&socketClient, &QWebSocket::connected, this, &CArreraClient::onServeurConnected);
-    connect(&socketClient, &QWebSocket::disconnected, this, []() {
-        qDebug() << "La connexion au serveur a été interrompue.";
-    });
+    // Connexion des signaux aux slots
+    connect(&socketClient, &QWebSocket::connected, this, &CArreraClient::onConnected);
+    connect(&socketClient, &QWebSocket::disconnected, this, &CArreraClient::onDisconnected);
     connect(&socketClient, &QWebSocket::textMessageReceived, this, &CArreraClient::onMessageResevied);
+    connect(&socketClient, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
+            this, &CArreraClient::onError);
+}
 
-    // Ouvrir la connexion avec l'URL spécifiée
-    qDebug() << "Connexion en cours au serveur WebSocket : " << url;
+CArreraClient::~CArreraClient()
+{
+    if (socketClient.state() == QAbstractSocket::ConnectedState) {
+        socketClient.close();
+    }
+}
+
+bool CArreraClient::connectToServeur(const QString url)
+{
     socketClient.open(QUrl(url));
-}
-
-bool CArreraClient::sendMessage(QString message){
-    if (message.isEmpty()){
-        return false;
-    }
-
-    if (socketClient.state() != QAbstractSocket::ConnectedState) {
-        cout << "Le socket n'est pas connecté." << endl;
-        return false;
-    }
-
-    cout << message.toStdString() << endl;
-    socketClient.sendTextMessage(message+"\n");
     return true;
-
 }
 
-void CArreraClient::onServeurConnected(){
-    socketClient.sendTextMessage(nameSoft+"\n");
+void CArreraClient::disconnectFromServer()
+{
+    if (socketClient.state() == QAbstractSocket::ConnectedState) {
+        socketClient.close();
+    }
+}
+
+bool CArreraClient::sendMessage(const QString &message)
+{
+    if (!isConnected) {
+        return false;
+    }
+    socketClient.sendTextMessage(nameSoft +" "+ message);
+    return true;
+}
+
+void CArreraClient::onConnected()
+{
+    isConnected = true;
+    // Envoyer le nom du logiciel dès la connexion
+    socketClient.sendTextMessage(nameSoft + "\n");
+    // Émettre le signal pour indiquer que la connexion est prête
+    emit connectionEstablished();
+}
+
+void CArreraClient::onDisconnected()
+{
+    isConnected = false;
+    emit connectionClosed();
 }
 
 void CArreraClient::onMessageResevied(const QString &message)
 {
-    signalEmitted = true;
     // Émettre un signal lorsqu'un message est reçu
     emit messageReceived(message);
 
-    if (message != "Message Received"){
+    if (message != "Message Received") {
         socketClient.sendTextMessage("Message Received");
     }
+}
+
+void CArreraClient::onError(QAbstractSocket::SocketError error)
+{
+    cout << "Erreur WebSocket: " << socketClient.errorString().toStdString()
+    << " (code: " << error << ")" << endl;
 }
