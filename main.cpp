@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     // Créer un client avec allocation dynamique pour pouvoir le connecter aux signaux
-    CArreraClient* client = new CArreraClient(nullptr, "Socket client");
+    CArreraClient* client = new CArreraClient(nullptr, "Socket-client");
 
     // Connecter le signal connectionEstablished pour savoir quand on peut envoyer des messages
     QObject::connect(client, &CArreraClient::connectionEstablished, [client]() {

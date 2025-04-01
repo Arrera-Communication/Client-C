@@ -37,7 +37,7 @@ bool CArreraClient::sendMessage(const QString &message)
     if (!isConnected) {
         return false;
     }
-    socketClient.sendTextMessage(nameSoft +" "+ message);
+    socketClient.sendTextMessage(message);
     return true;
 }
 
@@ -45,7 +45,7 @@ void CArreraClient::onConnected()
 {
     isConnected = true;
     // Envoyer le nom du logiciel dès la connexion
-    socketClient.sendTextMessage(nameSoft + "\n");
+    socketClient.sendTextMessage("namesoft "+nameSoft + "\n");
     // Émettre le signal pour indiquer que la connexion est prête
     emit connectionEstablished();
 }
