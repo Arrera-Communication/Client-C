@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
     // Connecter le signal connectionEstablished pour savoir quand on peut envoyer des messages
     QObject::connect(client, &CArreraClient::connectionEstablished, [client]() {
-        if (client->sendMessage("message"))
+        if (client->sendMessage("Je suis le client"))
             cout << "Message envoyé" << endl;
         else
             cout << "Erreur: Impossible d'envoyer le message" << endl;
